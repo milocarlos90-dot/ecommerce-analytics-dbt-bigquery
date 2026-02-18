@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: stg_products
+    description: "Staging model for products from thelook_ecommerce source."
+
+    columns:
+
+      - name: product_id
+        description: "Primary key for products."
+        tests:
+          - not_null
+          - unique
+
+      - name: cost
+        description: "Internal cost of the product."
+        tests:
+          - not_null
+
+      - name: retail_price
+        description: "Retail price of the product."
+        tests:
+          - not_null
+
+      - name: category
+        description: "Product category."
+
+      - name: product_name
+        description: "Name of the product."
+        tests:
+          - not_null:
+              arguments: {}
+              severity: warn 
+         # TODO: Investigate null product values
+
+      - name: brand
+        description: "Brand of the product."
+
+      - name: department
+        description: "Department the product belongs to."
+
+      - name: sku
+        description: "Stock keeping unit identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: distribution_center_id
+        description: "Foreign key to distribution centers."
+        tests:
+          - not_null
+        # TODO: Add relationship test to stg_distribution_centers
+        # once staging model for distribution centers is created 

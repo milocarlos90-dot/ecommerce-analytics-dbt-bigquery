@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Staging model for orders from thelook_ecommerce source."
+
+    columns:
+
+      - name: order_id
+        description: "Primary key for orders."
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: "Foreign key to users."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_users')
+                field: user_id
+
+      - name: status
+        description: "Order status."
+
+      - name: gender
+        description: "Gender associated with the order."
+
+      - name: created_at
+        description: "Timestamp when the order was created."
+        tests:
+          - not_null
+
+      - name: returned_at
+        description: "Timestamp when the order was returned."
+
+      - name: shipped_at
+        description: "Timestamp when the order was shipped."
+
+      - name: delivered_at
+        description: "Timestamp when the order was delivered."
+
+      - name: number_of_items
+        description: "Number of items included in the order."
+        tests:
+          - not_null

@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: stg_order_items
+    description: "Staging model for order items from thelook_ecommerce source."
+
+    columns:
+
+      - name: order_item_id
+        description: "Primary key for order items."
+        tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        description: "Foreign key to orders."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+
+      - name: user_id
+        description: "Foreign key to users."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_users')
+              field: user_id
+
+      - name: product_id
+        description: "Foreign key to products."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+
+      - name: inventory_item_id
+        description: "Identifier for inventory item."
+
+      - name: status
+        description: "Status of the order item."
+        tests:
+          - accepted_values:
+              values: ['pending', 'shipped', 'delivered', 'returned', 'cancelled','Shipped','Complete','Returned','Cancelled','Processing'] 
+              #TODO: Clean up naming aka caps first letter
+
+      - name: created_at
+        description: "Timestamp when the order item was created."
+        tests:
+          - not_null
+
+      - name: shipped_at
+        description: "Timestamp when the item was shipped."
+
+      - name: delivered_at
+        description: "Timestamp when the item was delivered."
+
+      - name: returned_at
+        description: "Timestamp when the item was returned."
+
+      - name: sale_price
+        description: "Final sale price of the order item."
+        tests:
+          - not_null

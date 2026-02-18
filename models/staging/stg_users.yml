@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: stg_users
+    description: "Staging model for users from thelook_ecommerce source."
+
+    columns:
+
+      - name: user_id
+        description: "Primary key for users."
+        tests:
+          - not_null
+          - unique
+
+      - name: email
+        description: "User email address."
+        tests:
+          - not_null
+          - unique:
+              arguments: {}
+              severity: warn
+
+
+      - name: first_name
+        description: "User first name."
+        tests:
+          - not_null
+
+      - name: last_name
+        description: "User last name."
+        tests:
+          - not_null
+
+      - name: age
+        description: "User age in years."
+        tests:
+          - not_null
+
+      - name: created_at
+        description: "Timestamp when the user was created."
+        tests:
+          - not_null
+
+      - name: gender
+        description: "User gender."
+
+      - name: country
+        description: "User country."
+
+      - name: latitude
+        description: "User latitude."
+
+      - name: longitude
+        description: "User longitude."
+
+      - name: user_geom
+        description: "Geographic location of the user as GEOGRAPHY type."
