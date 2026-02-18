@@ -1,13 +1,15 @@
 {{ config(materialized='view') }}
 
 select
+    id,
     order_id,
     user_id,
+    product_id,
+    inventory_item_id,
     status,
-    gender,
     created_at,
-    returned_at,
     shipped_at,
     delivered_at,
-    num_of_item
-from {{ source('thelook_ecommerce', 'orders') }}
+    returned_at,
+    sale_price
+from {{ source('thelook_ecommerce', 'order_items') }}
