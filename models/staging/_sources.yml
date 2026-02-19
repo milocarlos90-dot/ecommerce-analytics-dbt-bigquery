@@ -2,9 +2,14 @@ version: 2
 
 sources:
   - name: thelook_ecommerce
+    description: >
+      Public e-commerce dataset containing users, orders,
+      products, and inventory information used for analytics
+      engineering training.
+
     database: bigquery-public-data
     schema: thelook_ecommerce
-   
+
     config:
       freshness:
         warn_after: {count: 24, period: hour}
@@ -13,10 +18,16 @@ sources:
 
     tables:
       - name: orders
+        description: Customer orders placed on the platform.
+
       - name: order_items
+        description: Line items representing individual products within orders.
+
       - name: products
+        description: Product catalog containing item metadata.
+
       - name: users
+        description: Registered platform users and customer attributes.
 
-   
-
-
+      - name: inventory_items
+        description: Inventory tracking records for products.
