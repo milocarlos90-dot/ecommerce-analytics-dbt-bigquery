@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: stg_events
+    description: >
+      Staging model containing raw user interaction events from the
+      thelook_ecommerce platform. Standardizes event-level behavioral
+      data for downstream analytics models.
+
+    columns:
+      - name: id
+        description: Unique identifier for each event record.
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: Identifier of the user associated with the event.
+        tests:
+          - relationships:
+              to: ref('stg_users')
+              field: user_id
+
+      - name: sequence_number
+        description: Sequential order of events within a browsing session.
+
+      - name: session_id
+        description: Unique identifier representing a single user session.
+        tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp when the event occurred.
+        tests:
+          - not_null
+
+      - name: ip_address
+        description: IP address captured when the event was generated.
+
+      - name: city
+        description: City derived from the visitor IP address.
+
+      - name: state
+        description: State or region derived from the visitor IP address.
+
+      - name: postal_code
+        description: Postal or ZIP code associated with the event location.
+
+      - name: browser
+        description: Browser used by the visitor during the session.
+
+      - name: traffic_source
+        description: Marketing or referral source responsible for the visit.
+
+      - name: uri
+        description: Page or endpoint where the event occurred.
+
+      - name: event_type
+        description: Type of interaction performed by the user.
+        tests:
+          - not_null

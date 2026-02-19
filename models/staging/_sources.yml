@@ -31,3 +31,9 @@ sources:
 
       - name: inventory_items
         description: Inventory tracking records for products.
+
+      - name: distribution_centers
+        description: Distribution centers of products location data.
+
+      - name: events
+        description: Events data based on product website.

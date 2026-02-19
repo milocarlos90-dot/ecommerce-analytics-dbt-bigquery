@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_distribution_centers
+    description: >
+      Staging model for distribution centers from the thelook_ecommerce source.
+      Standardizes column names and data types for downstream transformations.
+
+    columns:
+      - name: distribution_center_id
+        description: Unique identifier for the distribution center.
+        tests:
+          - not_null
+          - unique
+
+      - name: distribution_center_name
+        description: Name of the distribution center.
+
+      - name: distribution_center_latitude
+        description: Latitude coordinate of the distribution center.
+
+      - name: distribution_center_longitude
+        description: Longitude coordinate of the distribution center.
+
+      - name: distribution_center_geom
+        description: Geographic representation of the distribution center location.
