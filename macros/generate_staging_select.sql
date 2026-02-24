@@ -4,7 +4,17 @@
 {% set columns = adapter.get_columns_in_relation(relation) %}
 
 {% for column in columns %}
-    cast({{ column.name }} as {{ column.data_type | upper }}) as {{ column.name }}{% if not loop.last %},{% endif %}
+
+    {% if column.name | lower == 'id' %}
+        cast({{ column.name }} as {{ column.data_type | upper }})
+            as {{ singularize(table_name) }}_id
+    {% else %}
+        cast({{ column.name }} as {{ column.data_type | upper }})
+            as {{ column.name }}
+    {% endif %}
+
+    {% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 {% endmacro %}

@@ -1,5 +1,3 @@
-{{ config(materialized='view') }}
-
 with source as (
 
     select *
@@ -10,7 +8,7 @@ with source as (
 renamed as (
 
     select
-        cast(id as int64)                    as user_id,
+        cast(id as int64)                    as customer_id,
         cast(first_name as string)           as first_name,
         cast(last_name as string)            as last_name,
         cast(email as string)                as email,

@@ -1,12 +1,12 @@
 version: 2
 
 models:
-  - name: stg_users
+  - name: stg_customers
     description: "Staging model for users from thelook_ecommerce source."
 
     columns:
 
-      - name: user_id
+      - name: customer_id
         description: "Primary key for users."
         tests:
           - not_null

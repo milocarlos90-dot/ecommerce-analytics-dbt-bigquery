@@ -8,7 +8,7 @@ models:
       data for downstream analytics models.
 
     columns:
-      - name: id
+      - name: event_id
         description: Unique identifier for each event record.
         tests:
           - not_null
@@ -18,8 +18,9 @@ models:
         description: Identifier of the user associated with the event.
         tests:
           - relationships:
-              to: ref('stg_users')
-              field: user_id
+              arguments:
+                to: ref('stg_users')
+                field: user_id
 
       - name: sequence_number
         description: Sequential order of events within a browsing session.
