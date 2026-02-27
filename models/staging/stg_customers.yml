@@ -16,10 +16,8 @@ models:
         description: "customer email address."
         data_tests:
           - not_null
-          - unique:
-              arguments:
-                severity: warn
-
+          - unique
+              
       - name: first_name
         description: "customer first name."
         data_tests:
