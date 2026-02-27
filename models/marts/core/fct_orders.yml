@@ -20,7 +20,7 @@ models:
       - name: order_id
         description: "Business identifier for the order."
         data_type: int64
-        tests:
+        data_tests:
           - not_null
           - unique
 
@@ -31,11 +31,12 @@ models:
       - name: customer_sk
         description: "Foreign key referencing dim_customers."
         data_type: string
-        tests:
+        data_tests:
           - not_null
           - relationships:
-              to: ref('dim_customers')
-              field: customer_sk
+              arguments:
+                to: ref('dim_customers')
+                field: customer_sk
 
       # --------------------------------------------------
       # Dates
@@ -44,15 +45,16 @@ models:
       - name: order_created_at
         description: "Timestamp when the order was created."
         data_type: timestamp
-        tests:
+        data_tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "<= CURRENT_TIMESTAMP()"
+              arguments:
+                expression: "<= CURRENT_TIMESTAMP()"
 
       - name: order_created_date
         description: "Date the order was created."
         data_type: date
-        tests:
+        data_tests:
           - not_null
 
       # --------------------------------------------------
@@ -86,84 +88,92 @@ models:
       - name: item_count
         description: "Total number of items in the order."
         data_type: int64
-        tests:
+        data_tests:
           - dbt_utils.accepted_range:
-              min_value: 1
-              max_value: 500
+              arguments:
+                min_value: 1
+                max_value: 500
 
       - name: distinct_products
         description: "Number of distinct products in the order."
         data_type: int64
-        tests:
+        data_tests:
           - dbt_utils.accepted_range:
-              min_value: 1
-              max_value: 100
+              arguments:
+                min_value: 1
+                max_value: 100
 
       - name: gross_revenue
         description: "Total gross revenue for the order."
-        data_type: numeric
-        tests:
+        data_type: numeric(31,2)
+        data_tests:
           - not_null
           - dbt_utils.accepted_range:
-              min_value: 0.01
-              max_value: 100000
+              arguments:
+                min_value: 0.01
+                max_value: 100000
 
       - name: completed_revenue
         description: "Revenue from completed orders."
-        data_type: numeric
+        data_type: numeric(31,2)
 
       - name: cancelled_revenue
         description: "Revenue from cancelled orders."
-        data_type: numeric
+        data_type: numeric(31,2)
 
       - name: returned_revenue
         description: "Revenue from returned orders."
-        data_type: numeric
+        data_type: numeric(31,2)
 
       - name: shipped_revenue
         description: "Revenue from shipped orders."
-        data_type: numeric
+        data_type: numeric(31,2)
 
       - name: processing_revenue
         description: "Revenue from orders currently processing."
-        data_type: numeric
+        data_type: numeric(31,2)
 
     # --------------------------------------------------
-    # Model-Level Business Logic Tests
+    # Model-Level Business Logic data_tests
     # --------------------------------------------------
 
-    tests:
+    data_tests:
 
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-           - order_id
-           - order_created_at
+          arguments:
+            combination_of_columns:
+             - order_id
+             - order_created_at
 
       # completed orders must have revenue
       - dbt_utils.expression_is_true:
-          expression: 
-            "NOT is_completed_order
-            OR completed_revenue > 0"
+          arguments:
+            expression: 
+              "NOT is_completed_order
+              OR completed_revenue > 0"
           
 
       # revenue cannot exceed gross revenue
       - dbt_utils.expression_is_true:
-          expression: 
-            "completed_revenue <= gross_revenue"
+          arguments:
+            expression: 
+              "completed_revenue <= gross_revenue"
           
 
       # cancelled orders should not generate completed revenue
       - dbt_utils.expression_is_true:
-          expression: 
-            "NOT is_cancelled_order
-            OR completed_revenue = 0"
+          arguments:
+            expression: 
+              "NOT is_cancelled_order
+              OR completed_revenue = 0"
           
 
       # only one terminal order state allowed
       - dbt_utils.expression_is_true:
-          expression: "
-            (
-              CAST(is_completed_order AS INT64) +
-              CAST(is_cancelled_order AS INT64) +
-              CAST(is_returned_order AS INT64)
-            ) <= 1"
+          arguments:
+            expression: "
+              (
+                CAST(is_completed_order AS INT64) +
+                CAST(is_cancelled_order AS INT64) +
+                CAST(is_returned_order AS INT64)
+              ) <= 1"

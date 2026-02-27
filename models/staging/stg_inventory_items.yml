@@ -9,17 +9,18 @@ models:
     columns:
       - name: inventory_item_id
         description: Unique identifier for each inventory item.
-        tests:
+        data_tests:
           - not_null
           - unique
 
       - name: product_id
         description: Identifier of the related product.
-        tests:
+        data_tests:
           - not_null
           - relationships:
-              to: ref('stg_products')
-              field: product_id
+              arguments:
+                to: ref('stg_products')
+                field: product_id
 
       - name: created_at
         description: Timestamp when the inventory item was created.
