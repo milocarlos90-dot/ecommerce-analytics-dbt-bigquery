@@ -40,8 +40,9 @@ models:
           - not_null
           - unique
           - dbt_utils.accepted_range:
-              min_value: 0
-              inclusive: false       
+              arguments:
+                min_value: 0
+                inclusive: false       
           - relationships:
               arguments:
                 to: ref('int_customers')

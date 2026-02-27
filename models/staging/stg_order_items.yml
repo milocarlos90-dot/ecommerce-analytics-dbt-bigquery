@@ -17,24 +17,27 @@ models:
         data_tests:
           - not_null
           - relationships:
-              to: ref('stg_orders')
-              field: order_id
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
 
       - name: customer_id
         description: "Foreign key to users."
         data_tests:
           - not_null
           - relationships:
-              to: ref('stg_users')
-              field: customer_id
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
 
       - name: product_id
         description: "Foreign key to products."
         data_tests:
           - not_null
           - relationships:
-              to: ref('stg_products')
-              field: product_id
+              arguments:
+                to: ref('stg_products')
+                field: product_id
 
       - name: inventory_item_id
         description: "Identifier for inventory item."
@@ -43,7 +46,8 @@ models:
         description: "Status of the order item."
         data_tests:
           - accepted_values:
-              values: ['pending', 'shipped', 'delivered', 'returned', 'cancelled','Shipped','Complete','Returned','Cancelled','Processing'] 
+              arguments:
+                values: ['pending', 'shipped', 'delivered', 'returned', 'cancelled','Shipped','Complete','Returned','Cancelled','Processing'] 
               #TODO: Clean up naming aka caps first letter
 
       - name: created_at

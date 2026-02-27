@@ -18,7 +18,7 @@ renamed as (
         cast(shipped_at as timestamp)        as shipped_at,
         cast(delivered_at as timestamp)      as delivered_at,
         cast(returned_at as timestamp)       as returned_at,
-        cast(sale_price as numeric)          as sale_price
+        round(cast(sale_price as numeric), 2) as sale_price
     from source
 
 )
