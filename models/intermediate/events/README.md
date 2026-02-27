@@ -44,4 +44,4 @@ Supports session-level analytics including:
 - customer journey analysis
 - acquisition channel performance
 
----
+#TODO add section on fct_customer_sessions
