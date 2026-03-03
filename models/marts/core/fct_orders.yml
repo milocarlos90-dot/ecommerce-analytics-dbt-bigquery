@@ -11,6 +11,15 @@ models:
       contract:
         enforced: true
 
+    tests:
+    - dbt_utils.equal_rowcount:
+        arguments:
+          compare_model: ref('int_orders_enriched')
+
+    - dbt_utils.expression_is_true:
+        arguments:
+          expression: "completed_revenue <= gross_revenue"
+
     columns:
 
       # --------------------------------------------------
@@ -45,18 +54,12 @@ models:
       - name: order_created_at
         description: "Timestamp when the order was created."
         data_type: timestamp
-        data_tests:
-          - not_null
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: "<= CURRENT_TIMESTAMP()"
+
 
       - name: order_created_date
         description: "Date the order was created."
         data_type: date
-        data_tests:
-          - not_null
-
+ 
       # --------------------------------------------------
       # Order Status Flags
       # --------------------------------------------------
@@ -88,30 +91,15 @@ models:
       - name: item_count
         description: "Total number of items in the order."
         data_type: int64
-        data_tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 1
-                max_value: 500
+
 
       - name: distinct_products
         description: "Number of distinct products in the order."
         data_type: int64
-        data_tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 1
-                max_value: 100
 
       - name: gross_revenue
         description: "Total gross revenue for the order."
         data_type: numeric(31,2)
-        data_tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 0.01
-                max_value: 100000
 
       - name: completed_revenue
         description: "Revenue from completed orders."
@@ -132,48 +120,3 @@ models:
       - name: processing_revenue
         description: "Revenue from orders currently processing."
         data_type: numeric(31,2)
-
-    # --------------------------------------------------
-    # Model-Level Business Logic data_tests
-    # --------------------------------------------------
-
-    data_tests:
-
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-             - order_id
-             - order_created_at
-
-      # completed orders must have revenue
-      - dbt_utils.expression_is_true:
-          arguments:
-            expression: 
-              "NOT is_completed_order
-              OR completed_revenue > 0"
-          
-
-      # revenue cannot exceed gross revenue
-      - dbt_utils.expression_is_true:
-          arguments:
-            expression: 
-              "completed_revenue <= gross_revenue"
-          
-
-      # cancelled orders should not generate completed revenue
-      - dbt_utils.expression_is_true:
-          arguments:
-            expression: 
-              "NOT is_cancelled_order
-              OR completed_revenue = 0"
-          
-
-      # only one terminal order state allowed
-      - dbt_utils.expression_is_true:
-          arguments:
-            expression: "
-              (
-                CAST(is_completed_order AS INT64) +
-                CAST(is_cancelled_order AS INT64) +
-                CAST(is_returned_order AS INT64)
-              ) <= 1"

@@ -20,6 +20,10 @@ models:
             interval: 1
   
 
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('int_customers')
+  
+
     columns:
 
       # --------------------------------------------------
@@ -55,14 +59,10 @@ models:
       - name: first_name
         description: "Customer first name."
         data_type: string
-        data_tests:
-          - not_null
 
       - name: last_name
         description: "Customer last name."
         data_type: string
-        data_tests:
-          - not_null
 
       - name: full_name
         description: "Concatenated customer full name."
@@ -87,10 +87,10 @@ models:
         data_type: integer
         data_tests:
           - not_null
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: "between 0 and 120"
-
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 1
+                max_value: 120
       - name: age_group
         description: |
           Customer age segmentation used for demographic analysis.

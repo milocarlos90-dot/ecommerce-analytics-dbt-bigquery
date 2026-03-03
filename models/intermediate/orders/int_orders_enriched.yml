@@ -4,41 +4,111 @@ models:
   - name: int_orders_enriched
     description: >
       Enriched orders model with standardized timestamps and lifecycle flags
-      derived from order status.
+      derived from normalized order status. Represents the canonical
+      lifecycle definition for orders used across downstream marts.
+
+    tests:
+      # Only one terminal lifecycle state allowed
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: >
+              (
+                CAST(is_completed_order AS INT64) +
+                CAST(is_cancelled_order AS INT64) +
+                CAST(is_returned_order AS INT64)
+              ) <= 1
 
     columns:
 
+      # --------------------------------------------------
+      # Primary Key
+      # --------------------------------------------------
+
       - name: order_id
-        description: Primary key for the order.
+        description: "Primary key for the order."
         data_tests:
           - not_null
           - unique
 
+      # --------------------------------------------------
+      # Relationships
+      # --------------------------------------------------
+
       - name: customer_id
-        description: Identifier of the customer who placed the order.
+        description: "Identifier of the customer who placed the order."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_customers')
+                field: customer_id
+
+      # --------------------------------------------------
+      # Lifecycle Status
+      # --------------------------------------------------
+
+      - name: status
+        description: "Normalized lifecycle status of the order."
         data_tests:
           - not_null
 
-      - name: status
-        description: Current lifecycle status of the order.
+      - name: status_standardized
+        description: "Normalized lifecycle status of the order."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - pending
+                  - processing
+                  - shipped
+                  - delivered
+                  - completed
+                  - returned
+                  - cancelled
+
+      # --------------------------------------------------
+      # Dates
+      # --------------------------------------------------
 
       - name: order_created_at
-        description: Timestamp when the order was created.
+        description: "Timestamp when the order was created."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "<= CURRENT_TIMESTAMP()"
 
       - name: order_created_date
-        description: Date portion of order_created_at for analytics use.
+        description: "Date portion of order_created_at for analytics use."
+        data_tests:
+          - not_null
+
+      # --------------------------------------------------
+      # Lifecycle Flags
+      # --------------------------------------------------
 
       - name: is_completed_order
-        description: True if order status is Complete.
+        description: "True if order status is completed."
+        data_tests:
+          - not_null
 
       - name: is_cancelled_order
-        description: True if order status is Cancelled.
+        description: "True if order status is cancelled."
+        data_tests:
+          - not_null
 
       - name: is_returned_order
-        description: True if order status is Returned.
+        description: "True if order status is returned."
+        data_tests:
+          - not_null
 
       - name: is_shipped_order
-        description: True if order status is Shipped.
+        description: "True if order status is shipped."
+        data_tests:
+          - not_null
 
       - name: is_processing_order
-        description: True if order status is Processing.
+        description: "True if order status is processing."
+        data_tests:
+          - not_null

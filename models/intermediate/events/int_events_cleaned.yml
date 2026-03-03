@@ -7,8 +7,12 @@ models:
       Removes bot/test traffic, standardizes timestamps, parses URI metadata,
       and normalizes event semantics. One row represents one user event.
 
-    columns:
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "seconds_since_previous_event >= 0 or seconds_since_previous_event is null"
 
+    columns:        
       - name: event_id
         description: Unique identifier for each event.
         data_tests:
@@ -33,6 +37,16 @@ models:
         description: >
           Platform-generated session identifier representing a user's browsing journey.
           Preserved from source events.
+        data_tests:
+          - not_null
+
+      - name: session_sequence_number
+        description: Sequential order of events within a browsing session.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
 
       - name: event_type
         description: Raw event type captured from the application event log.
@@ -54,7 +68,7 @@ models:
       - name: page_category
         description: Top-level page category extracted from URI path.
 
-      - name: product_slug
+      - name: product_id
         description: Product identifier parsed from product page URIs when available.
 
       - name: browser
@@ -62,3 +76,41 @@ models:
 
       - name: traffic_source
         description: Marketing or acquisition source of the event.
+
+      - name: is_conversion_event
+        description: >
+          Binary flag indicating whether the event represents a conversion.
+          Derived from event_category = 'conversion'.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 1
+
+      - name: is_session_entry_event
+        description: >
+          Binary flag indicating whether the event is the first event
+          within its session (session_sequence_number = 1).
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 1
+
+      - name: seconds_since_session_start
+        description: >
+          Number of seconds elapsed between the start of the
+          journey_session_id and the current event. Calculated as
+          the difference between event_ts and the minimum event_ts
+          within the session partition.
+
+      - name: seconds_since_previous_event
+        description: >
+          Number of seconds elapsed between the current event
+          and the previous event within the same journey_session_id,
+          ordered by session_sequence_number.
+          Null for the first event in a session.

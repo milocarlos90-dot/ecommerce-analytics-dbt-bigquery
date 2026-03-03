@@ -190,3 +190,108 @@ Use `dim_customers` when:
 - analyzing acquisition performance
 
 Avoid using raw or intermediate customer models directly in analytics.
+
+# Products Dimension
+
+## Purpose
+
+`dim_products` represents the canonical product dimension used across
+analytics and reporting.
+
+It provides a single, analytics-ready record per product containing
+descriptive attributes, pricing information, and classification
+metadata.
+
+Grain: **1 row per product**
+
+------------------------------------------------------------------------
+
+## Model
+
+### dim_products
+
+-   Standardizes product attributes from staging models\
+-   Defines the conformed product entity\
+-   Enforces schema contracts and data quality validations\
+-   Serves as the primary product join point across commerce and
+    behaviour marts
+
+------------------------------------------------------------------------
+
+## Key Identifiers
+
+-   `product_sk` → Surrogate key used in fact tables\
+-   `product_id` → Natural business key from source system\
+-   `sku` → Stock keeping unit
+
+------------------------------------------------------------------------
+
+## Descriptive Attributes
+
+### Product Details
+
+-   `product_name`
+-   `brand`
+-   `category`
+-   `department`
+
+### Pricing
+
+-   `retail_price`
+-   `cost`
+
+------------------------------------------------------------------------
+
+## Modeling Strategy
+
+`dim_products` defines the **conformed product entity** for the
+warehouse.
+
+Product data is:
+
+-   standardized\
+-   validated\
+-   enriched for analytical consistency
+
+The model ensures all fact tables reference a shared product definition
+through `product_sk`.
+
+It supports both:
+
+-   Behavioural analysis (via `fct_events`)
+-   Commercial analysis (via `fct_order_items` and `fct_orders`)
+
+------------------------------------------------------------------------
+
+## Upstream Dependencies
+
+Built from:
+
+-   `stg_products`
+
+------------------------------------------------------------------------
+
+## Downstream Usage
+
+Used by:
+
+-   `fct_events`
+-   `fct_order_items`
+-   Product performance analysis
+-   Revenue by product reporting
+-   Margin analysis
+-   Category and brand segmentation
+-   Inventory and pricing analytics
+
+------------------------------------------------------------------------
+
+## Analytics Guidance
+
+Use `dim_products` when:
+
+-   Joining product attributes to fact tables\
+-   Performing category or brand analysis\
+-   Calculating product-level KPIs\
+-   Analyzing pricing or margin performance
+
+Avoid using raw staging product tables directly in analytics.

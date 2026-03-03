@@ -1,0 +1,114 @@
+version: 2
+
+models:
+  - name: dim_products
+    config:
+      contract:
+        enforced: true
+    description: >
+      Products dimension derived from stg_products providing a single,
+      analytics-ready record per product. Includes product type, pricing,
+      and department details. Serves as the
+      canonical product entity for joining across core, product,
+      and marketing marts.
+
+    tests:
+      - dbt_utils.equal_rowcount:
+          arguments:
+            compare_model: ref('stg_products')
+  
+    columns:
+
+      # --------------------------------------------------
+      # Keys
+      # --------------------------------------------------
+
+      - name: product_sk
+        description: "Surrogate key for the product dimension."
+        data_type: string
+        data_tests:
+          - not_null
+          - unique
+
+
+      - name: product_id
+        description: "Natural business key identifying the product in the source system."
+        data_type: int64
+        data_tests:
+          - not_null
+          - unique   
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+
+      - name: sku
+        description: "SKU for the product dimension."
+        data_type: string
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: sku
+
+      # --------------------------------------------------
+      # Type
+      # --------------------------------------------------
+
+      - name: category
+        description: "Category of product."
+        data_type: string
+        data_tests:
+          - not_null
+
+      - name: brand
+        description: "Brand name of product."
+        data_type: string
+        data_tests:
+          - dbt_utils.not_null_proportion:
+                arguments:
+                  at_least: 0.95
+
+      - name: product_name
+        description: "Product name."
+        data_type: string
+       
+
+      # --------------------------------------------------
+      # Pricing
+      # --------------------------------------------------
+
+      - name: retail_price
+        description: "Price of product."
+        data_type: numeric(31,2)
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 10000
+
+      - name: cost
+        description: "Cost of product."
+        data_type: numeric(31,2)
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 10000
+
+      # --------------------------------------------------
+      # Internal
+      # --------------------------------------------------
+
+      - name: department
+        description: "Department i.e. Men or Women."
+        data_type: string
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Men', 'Women'] 
+       

@@ -15,7 +15,7 @@ renamed as (
         cast(user_id as int64)           as customer_id,
 
         -- session metadata
-        cast(sequence_number as int64)   as sequence_number,
+        cast(sequence_number as int64)   as session_sequence_number,
         cast(session_id as string)       as session_id,
 
         -- timestamps

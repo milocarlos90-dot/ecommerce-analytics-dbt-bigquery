@@ -22,8 +22,10 @@ models:
                 to: ref('stg_customers')
                 field: customer_id
 
-      - name: sequence_number
+      - name: session_sequence_number
         description: Sequential order of events within a browsing session.
+        data_tests:
+          - not_null
 
       - name: session_id
         description: Unique identifier representing a single user session.

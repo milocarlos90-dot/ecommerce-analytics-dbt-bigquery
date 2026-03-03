@@ -1,0 +1,161 @@
+version: 2
+
+models:
+  - name: fct_sessions
+    description: >
+      Session-level behavioral fact table derived from event data.
+      Represents one row per journey_session_id.
+      Aggregates event-level timing, engagement, and conversion behavior
+      into session-level metrics for analytics and reporting.
+
+    config:
+      contract:
+        enforced: true
+
+    columns:
+
+      # --------------------------------------------------
+      # Keys
+      # --------------------------------------------------
+
+      - name: journey_session_id
+        description: Application-defined session identifier. Primary key of the model.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: Natural key identifying the customer associated with the session.
+        data_type: int64
+
+      - name: customer_sk
+        description: Surrogate key referencing dim_customers.
+        data_type: string
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_sk
+
+      # --------------------------------------------------
+      # Timing
+      # --------------------------------------------------
+
+      - name: session_start_ts
+        description: Timestamp of the first event within the session.
+        data_type: timestamp
+        tests:
+          - not_null
+
+      - name: session_end_ts
+        description: Timestamp of the last event within the session.
+        data_type: timestamp
+        tests:
+          - not_null
+
+      - name: session_date
+        description: Calendar date derived from session_start_ts.
+        data_type: date
+        tests:
+          - not_null
+
+      - name: session_duration_seconds
+        description: Total duration of the session in seconds.
+        data_type: int64
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: session_duration_minutes
+        description: Total duration of the session in minutes.
+        data_type: int64
+
+      - name: session_duration_hours
+        description: Total duration of the session in hours.
+        data_type: int64
+
+      # --------------------------------------------------
+      # Engagement Metrics
+      # --------------------------------------------------
+
+      - name: event_count
+        description: Total number of events within the session.
+        data_type: int64
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+
+      - name: distinct_products_viewed
+        description: Number of unique products viewed during the session.
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      # --------------------------------------------------
+      # Behavioral Flags
+      # --------------------------------------------------
+
+      - name: has_conversion
+        description: Binary flag indicating whether a conversion occurred in the session.
+        data_type: int64
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+      - name: is_bounce
+        description: Binary flag indicating if the session contains only one event.
+        data_type: int64
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+      - name: session_type
+        description: >
+          Behavioral classification of the session based on engagement
+          and conversion activity.
+        data_type: string
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - conversion
+                  - research
+                  - single_product
+                  - browse
+
+      - name: time_to_purchase_seconds
+        description: >
+          Number of seconds from session start to first conversion event.
+          Null if no conversion occurred in the session.
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+              config:
+                where: "time_to_purchase_seconds IS NOT NULL"
+     
+      # --------------------------------------------------
+      # Acquisition Context
+      # --------------------------------------------------
+
+      - name: traffic_source
+        description: Traffic source captured from the session entry event.
+        data_type: string
+
+      - name: browser
+        description: Browser captured from the session entry event.
+        data_type: string

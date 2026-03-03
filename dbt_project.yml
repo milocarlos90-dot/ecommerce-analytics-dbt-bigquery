@@ -57,10 +57,10 @@ models:
     # -------------------------
     marts:
       +materialized: table
-      +schema: mart
+      +schema: marts
 
       core:
         +tags: ["core"]
 
-      product:
-        +tags: ["product"]
+      behaviour:
+        +tags: ["behaviour"]

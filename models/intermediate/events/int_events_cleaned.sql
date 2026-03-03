@@ -42,7 +42,8 @@ journeys_normalized as (
 
     select
         *,
-        session_id as journey_session_id
+        session_id as journey_session_id,
+
     from valid_traffic
 
 ),
@@ -56,7 +57,8 @@ metadata_parsed as (
     select
         *,
         regexp_extract(uri, r'^/([^/?]+)') as page_category,
-        regexp_extract(uri, r'/category/([^/?]+)') as product_slug
+        cast(regexp_extract(uri, r'/product/(\d+)') as int64) as product_id
+
     from journeys_normalized
 
 ),
@@ -84,7 +86,60 @@ events_normalized as (
 
     from metadata_parsed
 
+),
+
+/* -----------------------------------------------------------
+   6. Event flags
+----------------------------------------------------------- */
+
+events_flagged as (
+
+    select
+        *,
+
+        case when event_category = 'conversion'
+            then 1 else 0
+        end as is_conversion_event,
+
+        case when session_sequence_number = 1
+            then 1 else 0
+        end as is_session_entry_event
+
+    from events_normalized
+
+),
+
+/* -----------------------------------------------------------
+   7. Session timing helpers
+----------------------------------------------------------- */
+
+events_with_session_timing as (
+
+    select
+        *,
+
+        min(event_ts) over (
+            partition by journey_session_id
+        ) as session_start_ts,
+
+        timestamp_diff(
+            event_ts,
+            min(event_ts) over (partition by journey_session_id),
+            second
+        ) as seconds_since_session_start  ,
+
+        timestamp_diff(
+          event_ts,
+          lag(event_ts) over (
+            partition by journey_session_id
+            order by session_sequence_number
+         ),
+        second
+       ) as seconds_since_previous_event
+
+    from events_flagged
+
 )
 
 select *
-from events_normalized
+from events_with_session_timing

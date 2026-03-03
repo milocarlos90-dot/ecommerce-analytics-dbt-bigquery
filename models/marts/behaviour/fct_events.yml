@@ -1,0 +1,146 @@
+version: 2
+
+models:
+  - name: fct_events
+    description: >
+      Event-level fact table containing one record per user event.
+      Enriched with conformed dimension keys and session metadata.
+      Serves as the atomic behavioral fact for analytics and funnel modeling.
+
+    config:
+      contract:
+        enforced: true
+
+    # --------------------------------------------------
+    # Model-Level Tests
+    # --------------------------------------------------
+
+    tests:
+      - dbt_utils.equal_rowcount:
+          arguments:
+            compare_model: ref('int_events_cleaned')
+
+    columns:
+
+      # --------------------------------------------------
+      # Primary Identifier
+      # --------------------------------------------------
+
+      - name: event_id
+        description: "Unique identifier for the event."
+        data_type: int64
+        data_tests:
+          - not_null
+          - unique
+
+      # --------------------------------------------------
+      # Dimension Keys
+      # --------------------------------------------------
+
+      - name: customer_sk
+        description: "Foreign key referencing dim_customers."
+        data_type: string
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_sk
+              config:
+                where: "customer_sk IS NOT NULL"
+
+      - name: product_sk
+        description: "Foreign key referencing dim_products."
+        data_type: string
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_sk
+              config:
+                where: "product_sk IS NOT NULL"
+
+      - name: customer_id
+        description: "Natural customer identifier from source system."
+        data_type: int64
+
+      # --------------------------------------------------
+      # Event Timestamp
+      # --------------------------------------------------
+
+      - name: event_ts
+        description: "Exact timestamp when the event occurred."
+        data_type: timestamp
+
+      - name: event_date
+        description: "Calendar date derived from event_ts."
+        data_type: date
+
+      # --------------------------------------------------
+      # Event Attributes
+      # --------------------------------------------------
+
+      - name: event_type
+        description: "Raw application event type."
+        data_type: string
+
+      - name: event_category
+        description: "Normalized behavioral category."
+        data_type: string
+
+      - name: page_category
+        description: "Top-level page category extracted from URI."
+        data_type: string
+
+      - name: product_id
+        description: "Product id extracted from URI when applicable."
+        data_type: int64
+
+      - name: browser
+        description: "Browser used for the event."
+        data_type: string
+
+      - name: traffic_source
+        description: "Marketing acquisition source."
+        data_type: string
+
+      # --------------------------------------------------
+      # Session Metadata (Source-Level)
+      # --------------------------------------------------
+
+      - name: journey_session_id
+        description: >
+          Source-generated session identifier representing a browsing visit
+          captured by the application tracking system.
+        data_type: string
+
+      - name: session_sequence_number
+        description: "Sequential order of event within its journey session."
+        data_type: int64
+
+      # --------------------------------------------------
+      # Behavioral Flags
+      # --------------------------------------------------
+
+      - name: is_conversion_event
+        description: "Binary flag indicating conversion event."
+        data_type: int64
+
+      - name: is_session_entry_event
+        description: "Binary flag indicating first event in session."
+        data_type: int64
+
+      - name: seconds_since_session_start
+        description: >
+          Number of seconds elapsed between the start of the
+          journey_session_id and the current event. Calculated as
+          the difference between event_ts and the minimum event_ts
+          within the session partition.
+        data_type: int64
+
+      - name: seconds_since_previous_event
+        description: >
+          Number of seconds elapsed between the current event
+          and the previous event within the same journey_session_id,
+          ordered by session_sequence_number.
+          Null for the first event in a session.
+        data_type: int64  
