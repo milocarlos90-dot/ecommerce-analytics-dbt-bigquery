@@ -1,0 +1,22 @@
+SELECT 'Home' AS funnel_step, 1 AS funnel_order, COUNTIF(has_home = 1) AS sessions
+FROM {{ ref('fct_sessions') }}
+
+UNION ALL
+
+SELECT 'Department', 2, COUNTIF(has_department = 1)
+FROM {{ ref('fct_sessions') }}
+
+UNION ALL
+
+SELECT 'Product', 3, COUNTIF(has_product = 1)
+FROM {{ ref('fct_sessions') }}
+
+UNION ALL
+
+SELECT 'Cart', 4, COUNTIF(has_cart = 1)
+FROM {{ ref('fct_sessions') }}
+
+UNION ALL
+
+SELECT 'Purchase', 5, COUNTIF(has_purchase = 1)
+FROM {{ ref('fct_sessions') }}

@@ -43,6 +43,13 @@ session_aggregates as (
             end
         ) as time_to_purchase_seconds
 
+        -- FUNNEL FLAGS
+        max(case when event_type = 'home' then 1 else 0 end) as has_home,
+        max(case when event_type = 'department' then 1 else 0 end) as has_department,
+        max(case when event_type = 'product' then 1 else 0 end) as has_product,
+        max(case when event_type = 'cart' then 1 else 0 end) as has_cart,
+        max(case when event_type = 'purchase' then 1 else 0 end) as has_purchase
+
     from events
     group by journey_session_id
 
