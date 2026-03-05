@@ -40,8 +40,9 @@ session_aggregates as (
         min(
             case when is_conversion_event = 1
                  then seconds_since_session_start
+                 else null
             end
-        ) as time_to_purchase_seconds
+        ) as time_to_purchase_seconds,
 
         -- FUNNEL FLAGS
         max(case when event_type = 'home' then 1 else 0 end) as has_home,

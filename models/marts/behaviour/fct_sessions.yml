@@ -159,3 +159,59 @@ models:
       - name: browser
         description: Browser captured from the session entry event.
         data_type: string
+
+      - name: has_home
+        description: >
+          Session-level flag indicating whether the session included at least one
+          'home' event. Represents the first step in the funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 1
+
+      - name: has_department
+        description: >
+          Session-level flag indicating whether the session included a department
+          page view. Represents the second step in the funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 1
+
+      - name: has_product
+        description: >
+          Session-level flag indicating whether the session included a product
+          page view. Indicates product exploration behaviour within the session.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 1
+
+      - name: has_cart
+        description: >
+          Session-level flag indicating whether the session included an add-to-cart
+          event, representing purchase intent within the session.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 1
+
+      - name: has_purchase
+        description: >
+          Session-level flag indicating whether the session resulted in a purchase
+          event, representing the final step in the ecommerce funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range: 
+              arguments: 
+                min_value: 0
+                max_value: 1
+                
