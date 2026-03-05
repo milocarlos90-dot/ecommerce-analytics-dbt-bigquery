@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: fct_session_path_analysis
+    description: >
+      Session-level path analysis model capturing the ordered sequence of
+      event categories within each browsing session. Each row represents
+      one journey_session_id and the concatenated navigation path taken
+      through the site during that session.
+
+    config:
+      contract:
+        enforced: true
+
+    columns:
+
+      # --------------------------------------------------
+      # Session Identifier
+      # --------------------------------------------------
+
+      - name: journey_session_id
+        description: Unique session identifier.
+        data_type: string
+        data_tests:
+          - not_null
+          - unique
+
+      # --------------------------------------------------
+      # Session Path
+      # --------------------------------------------------
+
+      - name: session_path
+        description: >
+          Ordered sequence of event categories within the session,
+          representing the navigation path taken by the user.
+        data_type: string
+
+      - name: event_count
+        description: Total number of events recorded within the session.
+        data_type: int64

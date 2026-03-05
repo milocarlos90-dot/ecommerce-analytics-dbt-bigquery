@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: fct_funnel_time_to_step
+    description: >
+      Session-level funnel timing model measuring the time between key ecommerce
+      funnel milestones within a browsing session. Each row represents one
+      journey_session_id with timestamps for the first occurrence of each
+      funnel step and calculated durations between those milestones.
+
+    config:
+      contract:
+        enforced: true
+
+    columns:
+
+      # --------------------------------------------------
+      # Session Identifier
+      # --------------------------------------------------
+
+      - name: journey_session_id
+        description: Unique session identifier.
+        data_type: string
+        data_tests:
+          - not_null
+          - unique
+
+      # --------------------------------------------------
+      # Funnel Step Timestamps
+      # --------------------------------------------------
+
+      - name: home_ts
+        description: Timestamp of the first home page event within the session.
+        data_type: timestamp
+
+      - name: department_ts
+        description: Timestamp of the first department page event within the session.
+        data_type: timestamp
+
+      - name: product_ts
+        description: Timestamp of the first product page event within the session.
+        data_type: timestamp
+
+      - name: cart_ts
+        description: Timestamp of the first add-to-cart event within the session.
+        data_type: timestamp
+
+      - name: purchase_ts
+        description: Timestamp of the first purchase event within the session.
+        data_type: timestamp
+
+      # --------------------------------------------------
+      # Time Between Funnel Steps
+      # --------------------------------------------------
+
+      - name: seconds_home_to_department
+        description: Seconds between first home event and first department event.
+        data_type: int64
+
+      - name: seconds_department_to_product
+        description: Seconds between first department event and first product event.
+        data_type: int64
+
+      - name: seconds_product_to_cart
+        description: Seconds between first product event and first cart event.
+        data_type: int64
+
+      - name: seconds_cart_to_purchase
+        description: Seconds between first cart event and first purchase event.
+        data_type: int64

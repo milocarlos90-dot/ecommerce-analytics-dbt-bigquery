@@ -1,0 +1,109 @@
+version: 2
+
+models:
+  - name: fct_session_funnel_steps
+    description: >
+      Session-by-step ecommerce funnel fact table derived from fct_sessions.
+      Each row represents a session and a specific funnel step, with a flag
+      indicating whether the session reached that step. This structure enables
+      flexible funnel analysis and allows filtering by session-level dimensions
+      such as traffic source, browser, or date.
+
+    config:
+      contract:
+        enforced: true
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - journey_session_id
+              - funnel_step
+
+    columns:
+
+      # --------------------------------------------------
+      # Keys
+      # --------------------------------------------------
+
+      - name: journey_session_id
+        description: Application-defined session identifier. Primary key of the model.
+        data_type: string
+        data_tests:
+          - not_null
+
+
+      - name: customer_id
+        description: Natural key identifying the customer associated with the session.
+        data_type: int64
+
+      - name: customer_sk
+        description: Surrogate key referencing dim_customers.
+        data_type: string
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_sk
+
+      - name: session_date
+        description: Calendar date derived from session_start_ts.
+        data_type: date
+        data_tests:
+          - not_null
+
+      - name: traffic_source
+        description: Traffic source captured from the session entry event.
+        data_type: string
+
+      - name: browser
+        description: Browser captured from the session entry event.
+        data_type: string
+
+      - name: funnel_step
+        description: Name of the funnel stage.
+        data_type: string
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Home
+                  - Department
+                  - Product
+                  - Cart
+                  - Purchase
+
+      - name: funnel_order
+        description: Numeric ordering of the funnel step.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 5
+
+      - name: reached_step
+        description: Number of reached step in relation to the funnel step.
+        data_type: int64
+        data_tests:
+         - not_null
+         - dbt_utils.accepted_range:
+             arguments:
+               min_value: 0
+               
+      - name: reached_session_id
+        description: >
+          Nullable session identifier used for BI-safe aggregation.
+          Contains the journey_session_id only when the funnel step
+          was reached (reached_step = 1). Allows safe counting of
+          sessions reaching each funnel step using COUNT().
+        data_type: string
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fct_sessions')
+                field: journey_session_id
+              config:
+                where: "reached_session_id IS NOT NULL"

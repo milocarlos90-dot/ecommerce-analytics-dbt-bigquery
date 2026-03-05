@@ -21,7 +21,7 @@ models:
       - name: journey_session_id
         description: Application-defined session identifier. Primary key of the model.
         data_type: string
-        tests:
+        data_tests:
           - not_null
           - unique
 
@@ -32,7 +32,7 @@ models:
       - name: customer_sk
         description: Surrogate key referencing dim_customers.
         data_type: string
-        tests:
+        data_tests:
           - relationships:
               arguments:
                 to: ref('dim_customers')
@@ -45,25 +45,25 @@ models:
       - name: session_start_ts
         description: Timestamp of the first event within the session.
         data_type: timestamp
-        tests:
+        data_tests:
           - not_null
 
       - name: session_end_ts
         description: Timestamp of the last event within the session.
         data_type: timestamp
-        tests:
+        data_tests:
           - not_null
 
       - name: session_date
         description: Calendar date derived from session_start_ts.
         data_type: date
-        tests:
+        data_tests:
           - not_null
 
       - name: session_duration_seconds
         description: Total duration of the session in seconds.
         data_type: int64
-        tests:
+        data_tests:
           - not_null
           - dbt_utils.accepted_range:
               arguments:
@@ -84,7 +84,7 @@ models:
       - name: event_count
         description: Total number of events within the session.
         data_type: int64
-        tests:
+        data_tests:
           - not_null
           - dbt_utils.accepted_range:
               arguments:
@@ -93,7 +93,7 @@ models:
       - name: distinct_products_viewed
         description: Number of unique products viewed during the session.
         data_type: int64
-        tests:
+        data_tests:
           - dbt_utils.accepted_range:
               arguments:
                 min_value: 0
@@ -105,7 +105,7 @@ models:
       - name: has_conversion
         description: Binary flag indicating whether a conversion occurred in the session.
         data_type: int64
-        tests:
+        data_tests:
           - not_null
           - dbt_utils.accepted_range:
               arguments:
@@ -115,7 +115,7 @@ models:
       - name: is_bounce
         description: Binary flag indicating if the session contains only one event.
         data_type: int64
-        tests:
+        data_tests:
           - not_null
           - dbt_utils.accepted_range:
               arguments:
@@ -127,7 +127,7 @@ models:
           Behavioral classification of the session based on engagement
           and conversion activity.
         data_type: string
-        tests:
+        data_tests:
           - accepted_values:
               arguments:
                 values:
@@ -141,7 +141,7 @@ models:
           Number of seconds from session start to first conversion event.
           Null if no conversion occurred in the session.
         data_type: int64
-        tests:
+        data_tests:
           - dbt_utils.accepted_range:
               arguments:
                 min_value: 0
@@ -159,3 +159,126 @@ models:
       - name: browser
         description: Browser captured from the session entry event.
         data_type: string
+
+      - name: has_home
+        description: >
+         Session-level flag indicating whether the session included at least one
+         'home' event. Represents the first step in the funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+      - name: has_department
+        description: >
+         Session-level flag indicating whether the session included at least one
+         'department' event. Represents the first step in the funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+      - name: has_product
+        description: >
+         Session-level flag indicating whether the session included at least one
+         'product' event. Represents the first step in the funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+
+      - name: has_cart
+        description: >
+         Session-level flag indicating whether the session included at least one
+         'cart' event. Represents the first step in the funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+      - name: has_purchase
+        description: >
+         Session-level flag indicating whether the session included at least one
+         'purchase' event. Represents the first step in the funnel.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+                        
+      - name: product_view_count
+        description: Total number of product page view events within the session.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: cart_event_count
+        description: Total number of add-to-cart events within the session.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: purchase_event_count
+        description: Total number of purchase events within the session.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: first_event_type
+        description: Event type of the first event recorded in the session.
+        data_type: string
+        data_tests:
+          - not_null
+
+      - name: last_event_type
+        description: Event type of the final event recorded in the session.
+        data_type: string
+        data_tests:
+          - not_null
+
+      - name: max_session_sequence
+        description: Maximum event sequence number observed in the session, representing navigation depth.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+
+      - name: is_no_product_engagement
+        description: Binary flag indicating the session did not include product views, cart events, or purchases.
+        data_type: int64
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+      - name: funnel_depth
+        description: Numeric representation of the deepest funnel stage reached during the session.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 5
