@@ -38,3 +38,23 @@ models:
       - name: event_count
         description: Total number of events recorded within the session.
         data_type: int64
+
+      # --------------------------------------------------
+      # Behavioral Flags
+      # --------------------------------------------------
+
+      - name: has_conversion
+        description: Binary flag indicating whether a conversion occurred in the session.
+        data_type: int64
+        data_tests:
+          - not_null
+
+      # --------------------------------------------------
+      # Timing
+      # --------------------------------------------------
+
+      - name: session_duration_seconds
+        description: Total duration of the session in seconds.
+        data_type: int64
+        data_tests:
+          - not_null
