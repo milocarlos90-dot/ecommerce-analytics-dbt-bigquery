@@ -69,10 +69,91 @@ models:
         description: Seconds between first cart event and first purchase event.
         data_type: int64
 
+      - name: minutes_home_to_department
+        description: Minutes between first home event and first department event.
+        data_type: int64
+
+      - name: minutes_department_to_product
+        description: Minutes between first department event and first product event.
+        data_type: int64
+
+      - name: minutes_product_to_cart
+        description: Minutes between first product event and first cart event.
+        data_type: int64
+
       - name: minutes_cart_to_purchase
         description: Minutes between first cart event and first purchase event.
-        data_type: float64
+        data_type: int64
 
+
+      - name: hours_home_to_department
+        description: Hours between first home event and first department event.
+        data_type: int64
+
+      - name: hours_department_to_product
+        description: Hours between first department event and first product event.
+        data_type: int64
+
+      - name: hours_product_to_cart
+        description: Hours between first product event and first cart event.
+        data_type: int64
+
+      - name: hours_cart_to_purchase
+        description: Hours between first cart event and first purchase event.
+        data_type: int64
+
+      - name: time_to_purchase_minute_bucket
+        description: >
+          Bucketed representation of time taken to complete a purchase after
+          the cart event. Useful for analysing fast vs slow buyers.
+
+          Buckets are:
+          - 0-1 min
+          - 1-2 min
+          - 2-5 min
+          - 5-10 min
+          - 10+ min
+        data_type: string
+
+      - name: time_to_purchase_hour_bucket
+        description: >
+          Bucketed representation of time taken to complete a purchase after
+          the cart event. Useful for analysing fast vs slow buyers.
+
+          Buckets are:
+          - 0-1 hour
+          - 1-2 hour
+          - 2-5 hour
+          - 5-10 hour
+          - 10+ hour
+        data_type: string
+
+      - name: time_to_purchase_minute_bucket_order
+        description: >
+          Numeric ordering key used to ensure minute purchase-time buckets
+          appear in the correct order in BI tools (e.g., Looker Studio).
+          Lower values represent faster purchase times.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 5
+
+
+      - name: time_to_purchase_hour_bucket_order
+        description: >
+          Numeric ordering key used to ensure hour purchase-time buckets
+          appear in the correct order in BI tools.
+          Lower values represent faster purchase times.
+        data_type: int64
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 5
       # --------------------------------------------------
       # Behavioral Flags
       # --------------------------------------------------

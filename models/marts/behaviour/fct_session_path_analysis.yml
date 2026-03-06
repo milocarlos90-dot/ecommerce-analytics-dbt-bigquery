@@ -58,3 +58,27 @@ models:
         data_type: int64
         data_tests:
           - not_null
+
+      - name: path_length_bucket
+        description: >
+          Bucketed representation of the number of events within a session path.
+          Used to analyse customer journey complexity and conversion behaviour.
+
+          Buckets:
+            - 1 step
+            - 2-3 steps
+            - 4-5 steps
+            - 6-7 steps
+            - 8-10 steps
+            - 10+ steps
+        data_type: string
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                - "1 step"
+                - "2-3 steps"
+                - "4-5 steps"
+                - "6-7 steps"
+                - "8-10 steps"
+                - "10+ steps"
