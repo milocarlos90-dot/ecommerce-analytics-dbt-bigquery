@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: fct_funnel_time_to_step
+  - name: fct_funnel_time_to_steps
     description: >
       Session-level funnel timing model measuring the time between key ecommerce
       funnel milestones within a browsing session. Each row represents one
@@ -68,6 +68,10 @@ models:
       - name: seconds_cart_to_purchase
         description: Seconds between first cart event and first purchase event.
         data_type: int64
+
+      - name: minutes_cart_to_purchase
+        description: Minutes between first cart event and first purchase event.
+        data_type: float64
 
       # --------------------------------------------------
       # Behavioral Flags
