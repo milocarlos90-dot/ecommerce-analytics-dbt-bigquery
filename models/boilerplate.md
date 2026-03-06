@@ -403,6 +403,13 @@ ORDER BY order_week;
 
 ```
 
+SELECT
+journey_session_id
+FROM `ecommerce-analytics-training.dbt_prod_marts.fct_events` 
+GROUP BY journey_session_id
+HAVING SUM(CASE WHEN event_type = 'product' THEN 1 ELSE 0 END) = 0
+ 
+```
 ------------------------------------------------------------------------
 
 # ⚡ Final Checklist

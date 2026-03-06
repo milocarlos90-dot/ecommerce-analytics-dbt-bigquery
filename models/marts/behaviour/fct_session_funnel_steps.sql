@@ -23,6 +23,7 @@ funnel_steps as (
 
     cross join unnest([
 
+        struct('Session'    as funnel_step, 0 as funnel_order, 1               as reached_step),
         struct('Home'       as funnel_step, 1 as funnel_order, s.has_home       as reached_step),
         struct('Department' as funnel_step, 2 as funnel_order, s.has_department as reached_step),
         struct('Product'    as funnel_step, 3 as funnel_order, s.has_product    as reached_step),
@@ -35,18 +36,17 @@ funnel_steps as (
 
 select 
 
-        journey_session_id,
-        customer_id,
-        customer_sk,
-        session_date,
-        traffic_source,
-        browser,
+    journey_session_id,
+    customer_id,
+    customer_sk,
+    session_date,
+    traffic_source,
+    browser,
 
-        funnel_step,
-        funnel_order,
-        reached_step,
+    funnel_step,
+    funnel_order,
+    reached_step,
 
-        if(reached_step = 1, journey_session_id, null) as reached_session_id
-
+    if(reached_step = 1, journey_session_id, null) as reached_session_id
 
 from funnel_steps
