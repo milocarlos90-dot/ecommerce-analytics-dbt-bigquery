@@ -71,7 +71,47 @@ time_between_steps as (
         case
             when purchase_ts is not null and cart_ts is not null
             then timestamp_diff(purchase_ts, cart_ts, second)
-        end as seconds_cart_to_purchase
+        end as seconds_cart_to_purchase,
+
+        case
+            when department_ts is not null and home_ts is not null
+            then timestamp_diff(department_ts, home_ts, minute)
+        end as minutes_home_to_department,
+
+        case
+            when product_ts is not null and department_ts is not null
+            then timestamp_diff(product_ts, department_ts, minute)
+        end as minutes_department_to_product,
+
+        case
+            when cart_ts is not null and product_ts is not null
+            then timestamp_diff(cart_ts, product_ts, minute)
+        end as minutes_product_to_cart,
+
+        case
+            when purchase_ts is not null and cart_ts is not null
+            then timestamp_diff(purchase_ts, cart_ts, minute)
+        end as minutes_cart_to_purchase,
+
+        case
+            when department_ts is not null and home_ts is not null
+            then timestamp_diff(department_ts, home_ts, hour)
+        end as hours_home_to_department,
+
+        case
+            when product_ts is not null and department_ts is not null
+            then timestamp_diff(product_ts, department_ts, hour)
+        end as hours_department_to_product,
+
+        case
+            when cart_ts is not null and product_ts is not null
+            then timestamp_diff(cart_ts, product_ts, hour)
+        end as hours_product_to_cart,
+
+        case
+            when purchase_ts is not null and cart_ts is not null
+            then timestamp_diff(purchase_ts, cart_ts, hour)
+        end as hours_cart_to_purchase
 
     from step_times
 
@@ -90,9 +130,50 @@ select
     t.seconds_department_to_product,
     t.seconds_product_to_cart,
     t.seconds_cart_to_purchase,
+    t.minutes_home_to_department,
+    t.minutes_department_to_product,
+    t.minutes_product_to_cart,
+    t.minutes_cart_to_purchase,
+    t.hours_home_to_department,
+    t.hours_department_to_product,
+    t.hours_product_to_cart,
+    t.hours_cart_to_purchase,
 
     -- useful for Looker charts
-    t.seconds_cart_to_purchase / 60 as minutes_cart_to_purchase,
+
+    case
+        when t.minutes_cart_to_purchase is null then null
+        when t.minutes_cart_to_purchase  <= 1 then '0-1 min'
+        when t.minutes_cart_to_purchase  <= 2  then '1-2 min'
+        when t.minutes_cart_to_purchase  <= 5 then '2-5 min'
+        when t.minutes_cart_to_purchase  <= 10 then '5-10 min'
+        else '10+ min'
+    end as time_to_purchase_minute_bucket,
+
+    case
+        when t.hours_cart_to_purchase is null then null
+        when t.hours_cart_to_purchase <= 1 then '1 hour'
+        when t.hours_cart_to_purchase <= 2 then '1-2 hour'
+        when t.hours_cart_to_purchase <= 5 then '2-5 hour'
+        when t.hours_cart_to_purchase <= 10 then '5-10 hour'
+        else '10+ hour'
+    end as time_to_purchase_hour_bucket,
+
+    case
+        when t.minutes_cart_to_purchase <= 1 then 1
+        when t.minutes_cart_to_purchase <= 2 then 2
+        when t.minutes_cart_to_purchase <= 5 then 3
+        when t.minutes_cart_to_purchase <= 10 then 4
+        else 5
+    end as time_to_purchase_minute_bucket_order,
+
+    case
+        when t.hours_cart_to_purchase <= 1 then 1
+        when t.hours_cart_to_purchase <= 2 then 2
+        when t.hours_cart_to_purchase <= 5 then 3
+        when t.hours_cart_to_purchase <= 10 then 4
+        else 5
+    end as time_to_purchase_hour_bucket_order,
 
     s.has_conversion
 
