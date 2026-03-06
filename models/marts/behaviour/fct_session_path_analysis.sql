@@ -5,7 +5,15 @@ with events as (
 
 ),
 
+sessions as (
 
+    select
+        journey_session_id,
+        has_conversion,
+        session_duration_seconds
+    from {{ ref('fct_sessions') }}
+
+),
 
 /* -----------------------------------------------------------
    1. Build ordered event path per session
@@ -37,5 +45,5 @@ select
     s.session_duration_seconds
 
 from paths p
-left join {{ ref('fct_sessions') }} s
+left join sessions s
 using (journey_session_id)

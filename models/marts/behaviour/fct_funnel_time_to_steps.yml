@@ -68,3 +68,13 @@ models:
       - name: seconds_cart_to_purchase
         description: Seconds between first cart event and first purchase event.
         data_type: int64
+
+      # --------------------------------------------------
+      # Behavioral Flags
+      # --------------------------------------------------
+
+      - name: has_conversion
+        description: Binary flag indicating whether a conversion occurred in the session.
+        data_type: int64
+        data_tests:
+          - not_null
