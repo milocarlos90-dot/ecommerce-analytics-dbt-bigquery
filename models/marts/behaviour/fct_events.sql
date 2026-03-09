@@ -2,11 +2,21 @@
     materialized='incremental',
     unique_key='event_id',
     on_schema_change='append_new_columns',
+
     partition_by={
       "field": "event_date",
       "data_type": "date"
-    }
+    },
+
+    cluster_by=[
+      "customer_sk",
+      "product_sk"
+    ]
 ) }}
+/* ---------------------------------------------------------------------------------------------------
+   Partitioning, clustering and incremental logic are included for demonstration purposes. 
+   In real-world scenario, these optimizations would typically be applied only to much larger tables.
+*/ ---------------------------------------------------------------------------------------------------
 
 with events as (
 
@@ -15,7 +25,9 @@ with events as (
 
     {% if is_incremental() %}
         where event_ts >= (
-            select timestamp_sub(max(event_ts), interval 1 day)
+            select timestamp_sub(
+                coalesce(max(event_ts), timestamp('1900-01-01')),
+                interval 1 day)
             from {{ this }}
         )
     {% endif %}

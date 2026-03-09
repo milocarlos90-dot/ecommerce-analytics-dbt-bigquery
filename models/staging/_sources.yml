@@ -9,31 +9,52 @@ sources:
 
     database: bigquery-public-data
     schema: thelook_ecommerce
-
-    config:
-      freshness:
-        warn_after: {count: 24, period: hour}
-        error_after: {count: 48, period: hour}
-      loaded_at_field: created_at    
+      
 
     tables:
       - name: orders
         description: Customer orders placed on the platform.
+        config:
+          freshness:
+            warn_after: {count: 24, period: hour}
+            error_after: {count: 48, period: hour}
+          loaded_at_field: created_at  
 
       - name: order_items
         description: Line items representing individual products within orders.
+        config:
+          freshness:
+            warn_after: {count: 24, period: hour}
+            error_after: {count: 48, period: hour}
+          loaded_at_field: created_at  
 
       - name: products
         description: Product catalog containing item metadata.
 
+
       - name: users
         description: Registered platform users and customer attributes.
+        config:
+          freshness:
+            warn_after: {count: 24, period: hour}
+            error_after: {count: 48, period: hour}
+          loaded_at_field: created_at  
 
       - name: inventory_items
         description: Inventory tracking records for products.
+        config:
+          freshness:
+            warn_after: {count: 24, period: hour}
+            error_after: {count: 48, period: hour}
+          loaded_at_field: created_at  
 
       - name: distribution_centers
         description: Distribution centers of products location data.
 
       - name: events
         description: Events data based on product website.
+        config:
+          freshness:
+            warn_after: {count: 24, period: hour}
+            error_after: {count: 48, period: hour}
+          loaded_at_field: created_at  

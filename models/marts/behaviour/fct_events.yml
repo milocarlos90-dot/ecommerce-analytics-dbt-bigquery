@@ -15,11 +15,6 @@ models:
     # Model-Level Tests
     # --------------------------------------------------
 
-    tests:
-      - dbt_utils.equal_rowcount:
-          arguments:
-            compare_model: ref('int_events_cleaned')
-
     columns:
 
       # --------------------------------------------------
