@@ -51,6 +51,14 @@ Below is the high-level architecture of the analytics platform.
 
 ------------------------------------------------------------------------
 
+# Data Model Design
+
+Below is the high-level data model design of the Ecommerce analytics models.
+
+![Architecture Diagram](docs/ecommerce_analytics_data_model_diagram.png)
+
+------------------------------------------------------------------------
+
 # Tech Stack
 
   Layer                   Tool
