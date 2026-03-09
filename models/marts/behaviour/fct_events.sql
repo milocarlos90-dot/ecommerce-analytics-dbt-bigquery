@@ -1,5 +1,6 @@
 {{ config(
     materialized='incremental',
+    incremental_strategy='merge',
     unique_key='event_id',
     on_schema_change='append_new_columns',
 
@@ -27,7 +28,7 @@ with events as (
         where event_ts >= (
             select timestamp_sub(
                 coalesce(max(event_ts), timestamp('1900-01-01')),
-                interval 1 day)
+                interval 7 day)
             from {{ this }}
         )
     {% endif %}
