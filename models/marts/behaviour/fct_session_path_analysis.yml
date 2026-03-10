@@ -82,3 +82,7 @@ models:
                 - "6-7 steps"
                 - "8-10 steps"
                 - "10+ steps"
+
+      - name: dbt_updated_at
+        description: "Exact timestamp when the dbt last updated used for checking data freshness."
+        data_type: timestamp

@@ -120,3 +120,7 @@ models:
       - name: processing_revenue
         description: "Revenue from orders currently processing."
         data_type: numeric(31,2)
+
+      - name: dbt_updated_at
+        description: "Exact timestamp when the dbt last updated used for checking data freshness."
+        data_type: timestamp

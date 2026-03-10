@@ -175,8 +175,9 @@ select
         else 5
     end as time_to_purchase_hour_bucket_order,
 
-    s.has_conversion
+    s.has_conversion,
+    current_timestamp() as dbt_updated_at
 
 from time_between_steps t
-left join sessions s
+inner join sessions s
     using (journey_session_id)

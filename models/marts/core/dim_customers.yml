@@ -21,7 +21,8 @@ models:
   
 
       - dbt_utils.equal_rowcount:
-          compare_model: ref('int_customers')
+          arguments:
+            compare_model: ref('int_customers')
   
 
     columns:

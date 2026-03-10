@@ -10,7 +10,8 @@ models:
     tests:
 
      - dbt_utils.equal_rowcount:
-         compare_model: ref('int_orders_enriched')
+         arguments:
+           compare_model: ref('int_orders_enriched')
 
      - dbt_utils.expression_is_true:
          arguments:

@@ -50,7 +50,8 @@ final as (
         f.cancelled_revenue,
         f.returned_revenue,
         f.shipped_revenue,
-        f.processing_revenue
+        f.processing_revenue,
+        current_timestamp() as dbt_updated_at
 
     from orders o
     left join financials f

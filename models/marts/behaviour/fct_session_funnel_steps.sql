@@ -47,6 +47,7 @@ select
     funnel_order,
     reached_step,
 
-    if(reached_step = 1, journey_session_id, null) as reached_session_id
+    if(reached_step = 1, journey_session_id, null) as reached_session_id,
+    current_timestamp() as dbt_updated_at
 
 from funnel_steps

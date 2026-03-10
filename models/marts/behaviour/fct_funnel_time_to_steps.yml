@@ -163,3 +163,7 @@ models:
         data_type: int64
         data_tests:
           - not_null
+
+      - name: dbt_updated_at
+        description: "Exact timestamp when the dbt last updated used for checking data freshness."
+        data_type: timestamp

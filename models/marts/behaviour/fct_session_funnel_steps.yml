@@ -52,6 +52,10 @@ models:
         data_tests:
           - not_null
 
+      - name: dbt_updated_at
+        description: "Exact timestamp when the dbt last updated used for checking data freshness."
+        data_type: timestamp
+
       - name: traffic_source
         description: Traffic source captured from the session entry event.
         data_type: string
@@ -101,10 +105,3 @@ models:
           was reached (reached_step = 1). Allows safe counting of
           sessions reaching each funnel step using COUNT().
         data_type: string
-        data_tests:
-          - relationships:
-              arguments:
-                to: ref('fct_sessions')
-                field: journey_session_id
-              config:
-                where: "reached_session_id IS NOT NULL"

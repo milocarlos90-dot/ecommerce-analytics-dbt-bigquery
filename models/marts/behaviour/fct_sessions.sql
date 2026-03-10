@@ -1,16 +1,24 @@
+{{ config(
+    materialized='incremental',
+    incremental_strategy='insert_overwrite',
+    on_schema_change='append_new_columns',
+    partition_by={
+      "field": "session_last_event_date",
+      "data_type": "date"
+    },
+    cluster_by=["customer_sk"]
+) }}
+
 with events as (
 
+    select *
+    from {{ ref('int_events_cleaned') }}
 
-select *
-from {{ ref('int_events_cleaned') }}
-
+    {% if is_incremental() %}
+    where event_date >= date_sub(current_date, interval {{ var('incremental_lookback_days') }} day)
+    {% endif %}
 
 ),
-
-/* -----------------------------------------------------------
-
-1. Aggregate to session grain
-   ----------------------------------------------------------- */
 
 session_aggregates as (
 
@@ -25,6 +33,7 @@ select
     min(event_ts) as session_start_ts,
     max(event_ts) as session_end_ts,
     date(min(event_ts)) as session_date,
+    max(event_date) as session_last_event_date,
 
     timestamp_diff(max(event_ts), min(event_ts), second) as session_duration_seconds,
     timestamp_diff(max(event_ts), min(event_ts), minute) as session_duration_minutes,
@@ -157,6 +166,7 @@ select
     s.session_start_ts,
     s.session_end_ts,
     s.session_date,
+    s.session_last_event_date,
     s.session_duration_seconds,
     s.session_duration_minutes,
     s.session_duration_hours,
@@ -194,7 +204,8 @@ select
     s.has_product,
     s.has_cart,
     s.has_purchase,
-    s.funnel_depth
+    s.funnel_depth,
+    current_timestamp() as dbt_updated_at
 
 from session_enriched s
 left join customers c

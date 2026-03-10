@@ -24,6 +24,10 @@ models:
         data_tests:
           - not_null
           - unique
+          - relationships:
+              arguments:
+                to: ref('fct_events')
+                field: journey_session_id
 
       - name: customer_id
         description: Natural key identifying the customer associated with the session.
@@ -60,6 +64,12 @@ models:
         data_tests:
           - not_null
 
+      - name: session_last_event_date
+        description: Calendar date derived from the last session date.
+        data_type: date
+        data_tests:
+          - not_null
+          
       - name: session_duration_seconds
         description: Total duration of the session in seconds.
         data_type: int64
@@ -282,3 +292,7 @@ models:
               arguments:
                 min_value: 0
                 max_value: 5
+
+      - name: dbt_updated_at
+        description: "Exact timestamp when the dbt last updated used for checking data freshness."
+        data_type: timestamp

@@ -1,6 +1,6 @@
 {{ config(
     materialized='incremental',
-    incremental_strategy='merge',
+    incremental_strategy='insert_overwrite',
     unique_key='event_id',
     on_schema_change='append_new_columns',
 
@@ -14,10 +14,9 @@
       "product_sk"
     ]
 ) }}
-/* ---------------------------------------------------------------------------------------------------
-   Partitioning, clustering and incremental logic are included for demonstration purposes. 
-   In real-world scenario, these optimizations would typically be applied only to much larger tables.
-*/ ---------------------------------------------------------------------------------------------------
+
+-- Partitioning, clustering and incremental logic are included for demonstration purposes.
+-- In real-world scenarios, these optimizations are usually applied only to much larger tables.
 
 with events as (
 
@@ -25,13 +24,12 @@ with events as (
     from {{ ref('int_events_cleaned') }}
 
     {% if is_incremental() %}
-        where event_ts >= (
-            select timestamp_sub(
-                coalesce(max(event_ts), timestamp('1900-01-01')),
-                interval 7 day)
-            from {{ this }}
-        )
+    where event_date >= date_sub(current_date, interval {{ var('incremental_lookback_days') }} day)
     {% endif %}
+
+    -- {% if is_incremental() %}
+    -- where event_date >= date_sub(current_date, interval 7 day)
+    -- {% endif %}
 
 ),
 
@@ -86,7 +84,9 @@ final as (
 
         -- FLAGS
         e.is_conversion_event,
-        e.is_session_entry_event
+        e.is_session_entry_event,
+
+        current_timestamp() as dbt_updated_at
         
     from events e
     left join customers c

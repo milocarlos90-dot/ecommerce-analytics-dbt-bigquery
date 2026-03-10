@@ -1,7 +1,7 @@
 with events as (
 
     select *
-    from {{ ref('fct_events') }}
+    from {{ ref('fct_events') }} --incremental 
 
 ),
 
@@ -11,7 +11,7 @@ sessions as (
         journey_session_id,
         has_conversion,
         session_duration_seconds
-    from {{ ref('fct_sessions') }}
+    from {{ ref('fct_sessions') }} -- table
 
 ),
 
@@ -69,7 +69,8 @@ select
     p.event_count,
     p.path_length_bucket,
     s.has_conversion,
-    s.session_duration_seconds
+    s.session_duration_seconds,
+    current_timestamp() as dbt_updated_at
 
 from path_buckets p
 left join sessions s

@@ -15,6 +15,21 @@ models:
     # Model-Level Tests
     # --------------------------------------------------
 
+    tests:
+    - dbt_utils.recency:
+         arguments:
+          field: event_ts
+          datepart: day
+          interval: 1
+
+    - dbt_utils.equal_rowcount:
+        arguments:
+          compare_model: |
+            (
+              select * from {{ ref('int_events_cleaned') }}
+              where event_date >= date_sub(current_date, interval 60 day)
+            )
+
     columns:
 
       # --------------------------------------------------
@@ -70,6 +85,10 @@ models:
         description: "Calendar date derived from event_ts."
         data_type: date
 
+      - name: dbt_updated_at
+        description: "Exact timestamp when the dbt last updated used for checking data freshness."
+        data_type: timestamp
+
       # --------------------------------------------------
       # Event Attributes
       # --------------------------------------------------
@@ -107,6 +126,11 @@ models:
           Source-generated session identifier representing a browsing visit
           captured by the application tracking system.
         data_type: string
+        tests:
+          - relationships:
+              arguments:
+                to: ref('fct_sessions')
+                field: journey_session_id
 
       - name: session_sequence_number
         description: "Sequential order of event within its journey session."
