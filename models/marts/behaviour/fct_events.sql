@@ -27,9 +27,6 @@ with events as (
     where event_date >= date_sub(current_date, interval {{ var('incremental_lookback_days') }} day)
     {% endif %}
 
-    -- {% if is_incremental() %}
-    -- where event_date >= date_sub(current_date, interval 7 day)
-    -- {% endif %}
 
 ),
 
