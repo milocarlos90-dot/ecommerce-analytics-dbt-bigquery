@@ -1,6 +1,6 @@
 {{ config(
     materialized='incremental',
-    incremental_strategy='insert_overwrite',
+    incremental_strategy='merge',
     unique_key='event_id',
     on_schema_change='append_new_columns',
 
