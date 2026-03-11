@@ -1,6 +1,7 @@
 {{ config(
     materialized='incremental',
-    incremental_strategy='insert_overwrite',
+    incremental_strategy='merge',
+    unique_key='journey_session_id',
     on_schema_change='append_new_columns',
     partition_by={
       "field": "session_last_event_date",
