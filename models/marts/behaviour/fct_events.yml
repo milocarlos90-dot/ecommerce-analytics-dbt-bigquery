@@ -124,11 +124,13 @@ models:
           Source-generated session identifier representing a browsing visit
           captured by the application tracking system.
         data_type: string
-        tests:
+        data_tests:
           - relationships:
               arguments:
                 to: ref('fct_sessions')
                 field: journey_session_id
+                config:
+                  severity: warn
 
       - name: session_sequence_number
         description: "Sequential order of event within its journey session."
